@@ -64,24 +64,22 @@ export default function RaidArt() {
             <p className="text-lg mb-4">Be the first to contribute to the gallery.</p>
           </div>
         ) : (
-          <div className="space-y-8">
+          <div className="space-y-16">
             {artworks.map((art) => (
-              <div key={art.id} className="bg-black bg-opacity-50 rounded-lg overflow-hidden border border-red-500 hover:border-red-400 transition-colors duration-300">
-                <div className="flex flex-col md:flex-row">
-                  <div className="md:w-1/3">
-                    <img
-                      src={art.url}
-                      alt={art.description}
-                      className="w-full h-64 md:h-full object-cover"
-                    />
-                  </div>
-                  <div className="md:w-2/3 p-6">
-                    <h3 className="text-xl font-bold mb-2 text-red-300">{art.filename}</h3>
-                    <p className="text-sm text-gray-400 mb-4">
-                      {new Date(art.created_at).toLocaleDateString()} • {art.category}
-                    </p>
-                    <p className="text-gray-300">{art.description}</p>
-                  </div>
+              <div key={art.id} className="flex flex-col items-center">
+                <div className="w-full max-w-3xl">
+                  <h3 className="text-2xl font-bold mb-2 text-red-300">{art.filename}</h3>
+                  <img
+                    src={art.url}
+                    alt={art.description}
+                    className="w-full h-auto max-h-96 object-contain rounded-lg border border-red-500"
+                  />
+                </div>
+                <div className="text-center mt-6 max-w-2xl">
+                  <p className="text-sm text-gray-400 mb-4">
+                    {new Date(art.created_at).toLocaleDateString()} • {art.category}
+                  </p>
+                  <p className="text-gray-300 leading-relaxed">{art.description}</p>
                 </div>
               </div>
             ))}
@@ -91,7 +89,7 @@ export default function RaidArt() {
         <div className="text-center mt-12">
           <p className="text-lg mb-4">Got artistic talent? Want to contribute to the gallery?</p>
           <button className="px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition duration-300">
-            Upload Your MS Paint Masterpiece
+            Contact an Officer to Submit Your Art
           </button>
         </div>
       </div>
