@@ -84,7 +84,7 @@ export default function NewsArticle() {
       </div>
     )
   }
-
+//
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-900 via-orange-900 to-black text-white pt-16">
       <div className="max-w-4xl mx-auto px-4 py-12">
