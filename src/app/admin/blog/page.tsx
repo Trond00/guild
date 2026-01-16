@@ -1,17 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import dynamic from 'next/dynamic'
 import { createBrowserSupabaseClient } from '@/lib/supabase/client'
-import { EditorState, convertToRaw, ContentState, convertFromHTML } from 'draft-js'
-import draftToHtml from 'draftjs-to-html'
-import htmlToDraft from 'html-to-draftjs'
-
-const Editor = dynamic(
-  () => import('react-draft-wysiwyg').then(mod => mod.Editor),
-  { ssr: false }
-)
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
 
 interface BlogPost {
   id: string
@@ -36,30 +26,9 @@ export default function BlogAdmin() {
   const [loading, setLoading] = useState(true)
   const [editing, setEditing] = useState<BlogPost | null>(null)
   const [formData, setFormData] = useState({ title: '', content: '', author: '', images: [] as string[] })
-  const [editorState, setEditorState] = useState(EditorState.createEmpty())
   const [availableImages, setAvailableImages] = useState<Image[]>([])
   const [showImageSelector, setShowImageSelector] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
   const supabase = createBrowserSupabaseClient()
-
-  useEffect(() => {
-    setIsMounted(true)
-    return () => setIsMounted(false)
-  }, [])
-
-  const onEditorStateChange = (editorState: EditorState) => {
-    if (!isMounted) return
-    setEditorState(editorState)
-    const htmlContent = draftToHtml(convertToRaw(editorState.getCurrentContent()))
-    setFormData(prev => ({ ...prev, content: htmlContent }))
-  }
-
-  const htmlToEditorState = (html: string) => {
-    const blocksFromHtml = htmlToDraft(html)
-    const { contentBlocks, entityMap } = blocksFromHtml
-    const contentState = ContentState.createFromBlockArray(contentBlocks, entityMap)
-    return EditorState.createWithContent(contentState)
-  }
 
   useEffect(() => {
     fetchPosts()
@@ -112,7 +81,6 @@ export default function BlogAdmin() {
       } else {
         setEditing(null)
         setFormData({ title: '', content: '', author: '', images: [] })
-        setEditorState(EditorState.createEmpty())
         fetchPosts()
       }
     } else {
@@ -129,7 +97,6 @@ export default function BlogAdmin() {
         console.error('Error creating post:', error)
       } else {
         setFormData({ title: '', content: '', author: '', images: [] })
-        setEditorState(EditorState.createEmpty())
         fetchPosts()
       }
     }
@@ -143,7 +110,6 @@ export default function BlogAdmin() {
       author: post.author,
       images: Array.isArray(post.images) ? post.images : []
     })
-    setEditorState(htmlToEditorState(post.content))
   }
 
   const handleDelete = async (id: string) => {
@@ -164,7 +130,6 @@ export default function BlogAdmin() {
   const handleCancel = () => {
     setEditing(null)
     setFormData({ title: '', content: '', author: '', images: [] })
-    setEditorState(EditorState.createEmpty())
     setShowImageSelector(false)
   }
 
@@ -220,28 +185,15 @@ export default function BlogAdmin() {
             <label htmlFor="content" className="block text-sm font-medium text-gray-700">
               Content
             </label>
-            <div className="mt-1 border border-gray-300 rounded-md">
-              <Editor
-                editorState={editorState}
-                onEditorStateChange={onEditorStateChange}
-                toolbar={{
-                  options: ['inline', 'blockType', 'list', 'textAlign', 'link', 'image', 'history'],
-                  inline: {
-                    options: ['bold', 'italic', 'underline', 'strikethrough']
-                  },
-                  blockType: {
-                    options: ['Normal', 'H1', 'H2', 'H3']
-                  },
-                  list: {
-                    options: ['unordered', 'ordered']
-                  }
-                }}
-                editorStyle={{
-                  minHeight: '300px',
-                  padding: '10px'
-                }}
-              />
-            </div>
+            <textarea
+              id="content"
+              rows={8}
+              value={formData.content}
+              onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Write your blog post content here..."
+              required
+            />
           </div>
 
           {/* Image Selector */}
