@@ -52,15 +52,27 @@ export default function News() {
           Guild News
         </h1>
         <div className="space-y-12">
-          {newsItems.map((news, index) => (
-            <article key={index} className="bg-black bg-opacity-50 p-8 rounded-lg border-l-4 border-red-500">
+          {newsItems.map((news) => (
+            <article key={news.id} className="bg-black bg-opacity-50 p-8 rounded-lg border-l-4 border-red-500">
               <h2 className="text-3xl font-bold mb-4 text-red-300">{news.title}</h2>
               <div className="flex items-center mb-4 text-sm text-gray-400">
                 <span>{new Date(news.created_at).toLocaleDateString()}</span>
                 <span className="mx-2">•</span>
                 <span>By {news.author || 'Anonymous'}</span>
               </div>
-              <p className="text-lg leading-relaxed">{news.content}</p>
+              <div
+                className="text-lg leading-relaxed mb-6 line-clamp-4"
+                dangerouslySetInnerHTML={{ __html: news.content.replace(/<[^>]*>/g, '').substring(0, 200) + '...' }}
+              />
+              <a
+                href={`/news/${news.id}`}
+                className="inline-flex items-center px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200"
+              >
+                Read More
+                <svg className="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
             </article>
           ))}
         </div>
