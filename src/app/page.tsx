@@ -1,6 +1,6 @@
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-red-900 via-orange-900 to-black text-white">
+    <div className="min-h-screen bg-gradient-to-b from-red-900 via-orange-900 to-black text-white pt-16">
       {/* Hero Section */}
       <section className="relative flex items-center justify-center min-h-screen bg-gradient-to-b from-red-800 to-black">
         <div className="absolute inset-0 bg-black bg-opacity-30"></div>
