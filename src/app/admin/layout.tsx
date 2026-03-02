@@ -22,6 +22,7 @@ export default function AdminLayout({
 
   const navigation = [
     { name: 'Dashboard', href: '/admin', icon: '📊' },
+    { name: 'Frontpage', href: '/admin/frontpage', icon: '🏠' },
     { name: 'Roster', href: '/admin/roster', icon: '👥' },
     { name: 'Progression', href: '/admin/progression', icon: '⚔️' },
     { name: 'Raid-Art', href: '/admin/raid-art', icon: '🎨' },

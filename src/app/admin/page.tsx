@@ -1,6 +1,12 @@
 export default function AdminDashboard() {
   const adminSections = [
     {
+      title: "Frontpage Settings",
+      description: "Configure hero image and frontpage content",
+      link: "/admin/frontpage",
+      color: "bg-yellow-500"
+    },
+    {
       title: "Roster Management",
       description: "Add, edit, and manage guild members",
       link: "/admin/roster",

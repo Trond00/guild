@@ -1,15 +1,33 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+
 export default function Home() {
+  const [heroImageUrl, setHeroImageUrl] = useState('/expurgedforside.png')
+
+  useEffect(() => {
+    // Load saved hero image from localStorage
+    const savedHero = localStorage.getItem('heroImage')
+    if (savedHero) {
+      setHeroImageUrl(savedHero)
+    }
+  }, [])
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-900 via-orange-900 to-black text-white pt-16">
-      {/* Hero Section */}
-      <section className="relative flex items-center justify-center min-h-screen bg-gradient-to-b from-red-800 to-black">
+      {/* Hero Section (with background image) */}
+      <section
+        className="relative flex items-center justify-center min-h-screen bg-cover bg-center"
+        style={{ backgroundImage: `url('${heroImageUrl}')` }}
+      >
+        {/* dimming overlay so text remains legible */}
         <div className="absolute inset-0 bg-black bg-opacity-30"></div>
         <div className="relative z-10 text-center px-4">
           <h1 className="text-6xl md:text-8xl font-bold text-red-500 mb-4">
             ExPurged
           </h1>
           <p className="text-2xl md:text-4xl mb-2">Ragnaros - Horde</p>
-          <p className="text-xl md:text-2xl">Dominating Azeroth since 2005</p>
+          <p className="text-xl md:text-2xl">Dominating Azeroth</p>
           <button className="mt-8 px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition duration-300">
             Join the Horde
           </button>
