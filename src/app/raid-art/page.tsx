@@ -6,11 +6,13 @@ import { createBrowserSupabaseClient } from '@/lib/supabase/client'
 interface Artwork {
   id: string
   filename: string
+  display_name: string
   url: string
   description: string
   category: string
   uploaded_by: string
   created_at: string
+  order: number
 }
 
 export default function RaidArt() {
@@ -23,16 +25,45 @@ export default function RaidArt() {
   }, [])
 
   const fetchArtworks = async () => {
-    const { data, error } = await supabase
-      .from('images')
-      .select('*')
-      .in('category', ['art', 'drawings'])
-      .order('created_at', { ascending: false })
+    try {
+      // First try to fetch with order field
+      const { data: dataWithOrder, error: errorWithOrder } = await supabase
+        .from('images')
+        .select('*')
+        .in('category', ['art', 'drawings'])
+        .order('order', { ascending: true })
 
-    if (error) {
+      if (errorWithOrder && errorWithOrder.code === '42703') {
+        // Column 'order' doesn't exist, fetch without it and add default order
+        const { data: dataWithoutOrder, error: errorWithoutOrder } = await supabase
+          .from('images')
+          .select('*')
+          .in('category', ['art', 'drawings'])
+          .order('created_at', { ascending: false })
+
+        if (errorWithoutOrder) {
+          console.error('Error fetching artworks:', errorWithoutOrder)
+        } else {
+          // Add default order based on created_at
+          const artworksWithDefaultOrder = (dataWithoutOrder || []).map((art, index) => ({
+            ...art,
+            order: index + 1,
+            display_name: art.display_name || art.filename
+          }))
+          setArtworks(artworksWithDefaultOrder)
+        }
+      } else if (errorWithOrder) {
+        console.error('Error fetching artworks:', errorWithOrder)
+      } else {
+        // Add default display_name if missing
+        const artworksWithDefaults = (dataWithOrder || []).map(art => ({
+          ...art,
+          display_name: art.display_name || art.filename
+        }))
+        setArtworks(artworksWithDefaults)
+      }
+    } catch (error) {
       console.error('Error fetching artworks:', error)
-    } else {
-      setArtworks(data || [])
     }
     setLoading(false)
   }
@@ -68,7 +99,7 @@ export default function RaidArt() {
             {artworks.map((art) => (
               <div key={art.id} className="flex flex-col items-center">
                 <div className="w-full max-w-3xl">
-                  <h3 className="text-2xl font-bold mb-2 text-red-300">{art.filename}</h3>
+                  <h3 className="text-2xl font-bold mb-2 text-red-300">{art.display_name || art.filename}</h3>
                   <img
                     src={art.url}
                     alt={art.description}

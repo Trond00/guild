@@ -35,85 +35,130 @@ export default function AdminLayout({
   ]
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        >
-          <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
+    <>
+      {/* Admin-specific styles to override global dark theme */}
+      <style jsx global>{`
+        /* Force light theme for admin pages */
+        .admin-page {
+          color-scheme: light;
+        }
+        
+        /* Input fields - ensure dark text on white background */
+        .admin-page input,
+        .admin-page textarea,
+        .admin-page select {
+          background-color: white !important;
+          color: #333 !important;
+          border-color: #d1d5db !important;
+        }
+        
+        /* Input focus states */
+        .admin-page input:focus,
+        .admin-page textarea:focus,
+        .admin-page select:focus {
+          outline: 2px solid #3b82f6 !important;
+          outline-offset: 2px !important;
+        }
+        
+        /* Labels and text */
+        .admin-page label,
+        .admin-page p,
+        .admin-page span,
+        .admin-page div {
+          color: #333 !important;
+        }
+        
+        /* Buttons */
+        .admin-page button {
+          color: #333 !important;
+        }
+        
+        /* Admin page container */
+        .admin-page * {
+          color-scheme: light !important;
+        }
+      `}</style>
+      
+      <div className="flex h-screen bg-gray-100 admin-page" style={{ colorScheme: 'light' }}>
+        {/* Mobile sidebar backdrop */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <div className="absolute inset-0 bg-gray-600 opacity-75"></div>
+          </div>
+        )}
+
+        {/* Sidebar */}
+        <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
+          <div className="flex flex-col h-full">
+            {/* Logo */}
+            <div className="flex items-center justify-center h-16 px-4 bg-gray-900">
+              <h1 className="text-xl font-bold text-red-400">ExPurged Admin</h1>
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+              {navigation.map((item) => {
+                const isActive = pathname === item.href
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
+                      isActive
+                        ? 'bg-red-600 text-white'
+                        : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                    }`}
+                    onClick={() => setSidebarOpen(false)}
+                  >
+                    <span className="mr-3 text-lg">{item.icon}</span>
+                    {item.name}
+                  </Link>
+                )
+              })}
+            </nav>
+
+            {/* Logout */}
+            <div className="p-4 border-t border-gray-700">
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full px-4 py-3 text-sm font-medium text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200"
+              >
+                <span className="mr-3">🚪</span>
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
-      )}
 
-      {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-center h-16 px-4 bg-gray-900">
-            <h1 className="text-xl font-bold text-red-400">ExPurged Admin</h1>
-          </div>
+        {/* Main content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Top bar */}
+          <header className="bg-white shadow-sm lg:hidden">
+            <div className="flex items-center justify-between px-4 py-4">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+              <h1 className="text-lg font-semibold text-gray-900">Guild Admin</h1>
+              <div className="w-6"></div> {/* Spacer for centering */}
+            </div>
+          </header>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            {navigation.map((item) => {
-              const isActive = pathname === item.href
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200 ${
-                    isActive
-                      ? 'bg-red-600 text-white'
-                      : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                  }`}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <span className="mr-3 text-lg">{item.icon}</span>
-                  {item.name}
-                </Link>
-              )
-            })}
-          </nav>
-
-          {/* Logout */}
-          <div className="p-4 border-t border-gray-700">
-            <button
-              onClick={handleLogout}
-              className="flex items-center w-full px-4 py-3 text-sm font-medium text-gray-300 rounded-lg hover:bg-gray-700 hover:text-white transition-colors duration-200"
-            >
-              <span className="mr-3">🚪</span>
-              Logout
-            </button>
-          </div>
+          {/* Page content */}
+          <main className="flex-1 overflow-y-auto bg-gray-50">
+            <div className="p-6">
+              {children}
+            </div>
+          </main>
         </div>
       </div>
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
-        <header className="bg-white shadow-sm lg:hidden">
-          <div className="flex items-center justify-between px-4 py-4">
-            <button
-              onClick={() => setSidebarOpen(true)}
-              className="text-gray-500 hover:text-gray-700 focus:outline-none focus:text-gray-700"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <h1 className="text-lg font-semibold text-gray-900">Guild Admin</h1>
-            <div className="w-6"></div> {/* Spacer for centering */}
-          </div>
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto bg-gray-50">
-          <div className="p-6">
-            {children}
-          </div>
-        </main>
-      </div>
-    </div>
+    </>
   )
 }
