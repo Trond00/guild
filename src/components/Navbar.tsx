@@ -8,7 +8,6 @@ export default function Navbar() {
 
   const navItems = [
     { href: "/", label: "Home" },
-    { href: "/roster", label: "Roster" },
     { href: "/progression", label: "Progression" },
     { href: "/raid-art", label: "Raid-Art" },
     { href: "/news", label: "News" },
@@ -20,8 +19,15 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-2xl font-bold text-red-500">
-              ExPurged
+            <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity duration-200">
+              <img 
+                src="/ExPurged_Transparent_1.png" 
+                alt="ExPurged Logo" 
+                className="h-10 w-auto object-contain"
+                width={40}
+                height={40}
+              />
+              <span className="text-2xl font-bold text-red-500 drop-shadow-[0_4px_8px_rgba(0,0,0,0.8)]">ExPurged</span>
             </Link>
           </div>
           <div className="flex space-x-8">

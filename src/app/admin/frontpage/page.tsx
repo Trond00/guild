@@ -23,7 +23,7 @@ export default function AdminFrontpage() {
   const [images, setImages] = useState<Image[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [selectedImage, setSelectedImage] = useState<string>('')
+  const [selectedImage, setSelectedImage] = useState<string>('/expurgedforside.png')
   const [successMessage, setSuccessMessage] = useState('')
   const supabase = createBrowserSupabaseClient()
 
@@ -59,6 +59,13 @@ export default function AdminFrontpage() {
     
     // Save to localStorage for the frontpage to use
     localStorage.setItem('heroImage', selectedImage)
+    
+    // Trigger storage event manually for same-page updates
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'heroImage',
+      newValue: selectedImage,
+      oldValue: localStorage.getItem('heroImage')
+    }))
     
     setSuccessMessage('Hero image saved successfully!')
     setSaving(false)

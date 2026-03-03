@@ -1,0 +1,117 @@
+/* Color Theme Configuration */
+:root {
+  /* Primary Colors - Change these to customize your theme */
+  --color-primary: #1f2937;        /* Dark gray (replaces red) */
+  --color-primary-light: #374151;  /* Lighter gray */
+  --color-primary-dark: #111827;   /* Darkest gray */
+  
+  /* Accent Colors */
+  --color-accent: #6366f1;         /* Indigo (replaces orange) */
+  --color-accent-light: #818cf8;   /* Light indigo */
+  --color-accent-dark: #4f46e5;    /* Dark indigo */
+  
+  /* Text Colors */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #d1d5db;
+  --color-text-muted: #9ca3af;
+  
+  /* Background Colors */
+  --color-bg-primary: #0f172a;     /* Dark blue-gray */
+  --color-bg-secondary: #1e293b;   /* Medium blue-gray */
+  --color-bg-tertiary: #334155;    /* Light blue-gray */
+  
+  /* Border Colors */
+  --color-border: #334155;
+  
+  /* Button Colors */
+  --color-btn-primary: #6366f1;
+  --color-btn-primary-hover: #4f46e5;
+  --color-btn-secondary: #64748b;
+  --color-btn-secondary-hover: #475569;
+}
+
+/* Alternative Color Schemes - Uncomment one to use */
+
+/* Classic Dark Theme */
+
+:root {
+  --color-primary: #0ea5e9;        /* Blue */
+  --color-primary-light: #38bdf8;  /* Light blue */
+  --color-primary-dark: #0284c7;   /* Dark blue */
+  
+  --color-accent: #22c55e;         /* Green */
+  --color-accent-light: #4ade80;   /* Light green */
+  --color-accent-dark: #16a34a;    /* Dark green */
+  
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #e5e7eb;
+  --color-text-muted: #94a3b8;
+  
+  --color-bg-primary: #0b1220;     /* Very dark blue */
+  --color-bg-secondary: #111827;   /* Dark gray */
+  --color-bg-tertiary: #1f2937;    /* Medium gray */
+  
+  --color-border: #374151;
+  
+  --color-btn-primary: #0ea5e9;
+  --color-btn-primary-hover: #0284c7;
+  --color-btn-secondary: #64748b;
+  --color-btn-secondary-hover: #475569;
+}
+*/
+
+/* Purple Theme */
+
+:root {
+  --color-primary: #a855f7;        /* Purple */
+  --color-primary-light: #c084fc;  /* Light purple */
+  --color-primary-dark: #9333ea;   /* Dark purple */
+  
+  --color-accent: #f59e0b;         /* Amber */
+  --color-accent-light: #fbbf24;   /* Light amber */
+  --color-accent-dark: #d97706;    /* Dark amber */
+  
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #f3f4f6;
+  --color-text-muted: #9ca3af;
+  
+  --color-bg-primary: #0f172a;     /* Navy */
+  --color-bg-secondary: #1e293b;   /* Slate */
+  --color-bg-tertiary: #334155;    /* Slate dark */
+  
+  --color-border: #334155;
+  
+  --color-btn-primary: #a855f7;
+  --color-btn-primary-hover: #9333ea;
+  --color-btn-secondary: #64748b;
+  --color-btn-secondary-hover: #475569;
+}
+*/
+
+/* Green Theme */
+
+:root {
+  --color-primary: #10b981;        /* Emerald */
+  --color-primary-light: #34d399;  /* Light emerald */
+  --color-primary-dark: #059669;   /* Dark emerald */
+  
+  --color-accent: #f59e0b;         /* Amber */
+  --color-accent-light: #fbbf24;   /* Light amber */
+  --color-accent-dark: #d97706;    /* Dark amber */
+  
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #f8fafc;
+  --color-text-muted: #94a3b8;
+  
+  --color-bg-primary: #062e26;     /* Dark emerald bg */
+  --color-bg-secondary: #0f3d36;   /* Medium emerald bg */
+  --color-bg-tertiary: #164e44;    /* Light emerald bg */
+  
+  --color-border: #1f4d43;
+  
+  --color-btn-primary: #10b981;
+  --color-btn-primary-hover: #059669;
+  --color-btn-secondary: #64748b;
+  --color-btn-secondary-hover: #475569;
+}
+
