@@ -9,17 +9,40 @@ interface BlogPost {
   content: string
   author: string
   created_at: string
-  image_url?: string
+  images?: string[]
+}
+
+interface GalleryImage {
+  id: string
+  filename: string
+  url: string
+  description: string
+  category: string
 }
 
 export default function News() {
   const [newsItems, setNewsItems] = useState<BlogPost[]>([])
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([])
   const [loading, setLoading] = useState(true)
   const supabase = createBrowserSupabaseClient()
 
   useEffect(() => {
     fetchNews()
+    fetchGalleryImages()
   }, [])
+
+  const fetchGalleryImages = async () => {
+    const { data, error } = await supabase
+      .from('images')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching gallery images:', error)
+    } else {
+      setGalleryImages(data || [])
+    }
+  }
 
   const fetchNews = async () => {
     const { data, error } = await supabase
@@ -30,9 +53,67 @@ export default function News() {
     if (error) {
       console.error('Error fetching news:', error)
     } else {
-      setNewsItems(data || [])
+      // Parse images arrays if they're stored as JSON strings
+      const parsedNews = (data || []).map(newsItem => {
+        if (typeof newsItem.images === 'string') {
+          try {
+            newsItem.images = JSON.parse(newsItem.images)
+          } catch (e) {
+            console.error('Error parsing images:', e)
+            newsItem.images = []
+          }
+        }
+        return newsItem
+      })
+      setNewsItems(parsedNews)
     }
     setLoading(false)
+  }
+
+  const getHeroImage = (newsItem: BlogPost) => {
+    // If news item has specific images, use the first one
+    if (newsItem.images && newsItem.images.length > 0) {
+      const specificImage = newsItem.images[0]
+      if (specificImage && isValidImageUrl(specificImage)) {
+        return specificImage
+      }
+    }
+    
+    // Otherwise, use a random gallery image or fallback
+    if (galleryImages.length > 0) {
+      // Use a consistent "random" image based on the news item ID
+      const index = Math.abs(hashCode(newsItem.id)) % galleryImages.length
+      const galleryImage = galleryImages[index]
+      if (galleryImage && galleryImage.url && isValidImageUrl(galleryImage.url)) {
+        return galleryImage.url
+      }
+    }
+    
+    return null
+  }
+
+  const isValidImageUrl = (url: string) => {
+    // Check if URL is valid and not empty
+    if (!url || typeof url !== 'string') return false
+    
+    // Check if it's a valid URL format
+    try {
+      new URL(url)
+      return true
+    } catch {
+      return false
+    }
+  }
+
+  // Simple hash function for consistent "random" selection
+  const hashCode = (str: string) => {
+    let hash = 0
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i)
+      hash = ((hash << 5) - hash) + char
+      hash = hash & hash // Convert to 32-bit integer
+    }
+    return hash
   }
 
   if (loading) {
@@ -66,10 +147,10 @@ export default function News() {
                 className="bg-black bg-opacity-60 rounded-xl overflow-hidden border border-red-500 hover:bg-opacity-70 transition-all duration-300 transform hover:scale-105"
               >
                 {/* Image Section */}
-                {news.image_url ? (
+                {getHeroImage(news) ? (
                   <div className="relative h-48 bg-gray-800">
                     <img 
-                      src={news.image_url} 
+                      src={getHeroImage(news) || ''} 
                       alt={news.title}
                       className="w-full h-full object-cover"
                     />
