@@ -36,21 +36,36 @@ export default function Home() {
         .limit(1)
 
       if (error) {
-        console.error('Error fetching hero image:', error)
-        // Fall back to default image
-        setHeroImageUrl('/expurgedforside.png')
+        console.error('Error fetching hero image from database:', error)
+        // Fall back to localStorage
+        const savedHero = localStorage.getItem('heroImage')
+        if (savedHero && savedHero !== '/expurgedforside.png') {
+          console.log('Using hero image from localStorage:', savedHero)
+          setHeroImageUrl(savedHero)
+        } else {
+          console.log('No hero image found, using default')
+          setHeroImageUrl('/expurgedforside.png')
+        }
       } else if (data && data.length > 0) {
-        console.log('Hero image from backend:', data[0].url)
+        console.log('Hero image from database:', data[0].url)
         // Validate the URL before setting it
         if (data[0].url && data[0].url.trim() !== '') {
           setHeroImageUrl(data[0].url)
         } else {
-          console.log('Invalid hero image URL, using default')
+          console.log('Invalid hero image URL from database, using default')
           setHeroImageUrl('/expurgedforside.png')
         }
       } else {
-        console.log('No hero image found in backend, using default')
-        setHeroImageUrl('/expurgedforside.png')
+        console.log('No hero image found in database, checking localStorage')
+        // Fall back to localStorage
+        const savedHero = localStorage.getItem('heroImage')
+        if (savedHero && savedHero !== '/expurgedforside.png') {
+          console.log('Using hero image from localStorage:', savedHero)
+          setHeroImageUrl(savedHero)
+        } else {
+          console.log('No hero image found, using default')
+          setHeroImageUrl('/expurgedforside.png')
+        }
       }
     } catch (error) {
       console.error('Error fetching hero image:', error)
@@ -121,7 +136,7 @@ export default function Home() {
       {/* About Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-black bg-opacity-80">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-8 text-red-400">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-8 text-white-400">
             About Us
           </h2>
           <div className="bg-gradient-to-r from-red-900 to-orange-900 p-8 rounded-xl shadow-2xl">
@@ -137,7 +152,7 @@ export default function Home() {
       {/* Latest News Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-red-900 to-orange-900">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-12 text-center text-red-400">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-12 text-center text-White-400">
             Latest News
           </h2>
           {loading ? (
@@ -191,7 +206,7 @@ export default function Home() {
       {/* Join ExPurged Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-black bg-opacity-80">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-8 text-red-400">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-8 text-white-400">
             Join ExPurged
           </h2>
           <div className="bg-gradient-to-r from-orange-900 to-red-900 p-8 rounded-xl shadow-2xl mb-8">
@@ -226,11 +241,21 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <p className="text-lg mb-4 font-semibold">For the Horde!</p>
           <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-8 text-sm">
-            <a href="#" className="text-red-400 hover:text-red-300 transition-colors">
-              Discord
+            <a 
+              href="https://www.warcraftlogs.com/guild/eu/ragnaros/expurged" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-red-400 hover:text-red-300 transition-colors"
+            >
+              Warcraft Logs
             </a>
-            <a href="#" className="text-red-400 hover:text-red-300 transition-colors">
-              Battle.net
+            <a 
+              href="https://raider.io/guilds/eu/ragnaros/Expurged" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-red-400 hover:text-red-300 transition-colors"
+            >
+              Raider.IO
             </a>
             <a href="#" className="text-red-400 hover:text-red-300 transition-colors">
               YouTube

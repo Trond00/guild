@@ -196,6 +196,32 @@ export default async function Progression() {
           Raid Progression
         </h1>
 
+        {/* Work in Progress Message */}
+        <div className="mb-10 rounded-lg border border-red-500 bg-black bg-opacity-50 p-6 text-center">
+          <div className="text-2xl font-bold text-red-300 mb-4">Work in Progress</div>
+          <p className="text-gray-300 mb-4">Our raid progression system is currently being developed.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <a
+              href="https://www.warcraftlogs.com/guild/eu/ragnaros/expurged"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200"
+            >
+              <span className="mr-2">📊</span>
+              View Warcraft Logs
+            </a>
+            <a
+              href="https://raider.io/guilds/eu/ragnaros/Expurged"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white font-medium rounded-lg transition-colors duration-200"
+            >
+              <span className="mr-2">🏆</span>
+              View Raider.IO
+            </a>
+          </div>
+        </div>
+
         {errorMessage && (
           <div className="mb-10 rounded-lg border border-red-500 bg-black bg-opacity-50 p-6 text-center text-red-200">
             {errorMessage}

@@ -55,20 +55,57 @@ export default function AdminFrontpage() {
   }
 
   const handleSave = async () => {
+    if (!selectedImage || selectedImage === '/expurgedforside.png') {
+      setSuccessMessage('Please select an image first!')
+      return
+    }
+
     setSaving(true)
     
-    // Save to localStorage for the frontpage to use
-    localStorage.setItem('heroImage', selectedImage)
-    
-    // Trigger storage event manually for same-page updates
-    window.dispatchEvent(new StorageEvent('storage', {
-      key: 'heroImage',
-      newValue: selectedImage,
-      oldValue: localStorage.getItem('heroImage')
-    }))
-    
-    setSuccessMessage('Hero image saved successfully!')
-    setSaving(false)
+    try {
+      // First, reset all images to remove hero category
+      const { error: resetError } = await supabase
+        .from('images')
+        .update({ category: 'art' })
+        .eq('category', 'hero')
+
+      if (resetError) {
+        console.error('Error resetting hero images:', resetError)
+        throw resetError
+      }
+
+      // Find the selected image and update its category to 'hero'
+      const selectedImageId = images.find(img => img.url === selectedImage)?.id
+      
+      if (selectedImageId) {
+        const { error: updateError } = await supabase
+          .from('images')
+          .update({ category: 'hero' })
+          .eq('id', selectedImageId)
+
+        if (updateError) {
+          console.error('Error updating hero image:', updateError)
+          throw updateError
+        }
+      }
+
+      // Also save to localStorage for backward compatibility
+      localStorage.setItem('heroImage', selectedImage)
+      
+      // Trigger storage event manually for same-page updates
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'heroImage',
+        newValue: selectedImage,
+        oldValue: localStorage.getItem('heroImage')
+      }))
+      
+      setSuccessMessage('Hero image saved successfully!')
+    } catch (error) {
+      console.error('Error saving hero image:', error)
+      setSuccessMessage('Error saving hero image. Please try again.')
+    } finally {
+      setSaving(false)
+    }
     
     // Clear success message after 3 seconds
     setTimeout(() => {
