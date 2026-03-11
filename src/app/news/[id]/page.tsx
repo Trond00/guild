@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { createBrowserSupabaseClient } from '@/lib/supabase/client'
+import GalleryModal from '../../../components/GalleryModal'
 
 interface BlogPost {
   id: string
@@ -25,6 +26,11 @@ export default function NewsArticle() {
   const router = useRouter()
   const [article, setArticle] = useState<BlogPost | null>(null)
   const [loading, setLoading] = useState(true)
+  
+  // Gallery Modal State
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false)
+  const [galleryImagesForModal, setGalleryImagesForModal] = useState<string[]>([])
+  const [galleryCurrentIndex, setGalleryCurrentIndex] = useState(0)
   const supabase = createBrowserSupabaseClient()
 
   useEffect(() => {
@@ -104,7 +110,15 @@ export default function NewsArticle() {
               <h3 className="text-xl font-bold mb-4 text-red-300">Gallery</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {article.images.map((imageUrl: string, index: number) => (
-                  <div key={index} className="bg-black bg-opacity-50 rounded-lg overflow-hidden border border-red-500">
+                  <div 
+                    key={index} 
+                    className="bg-black bg-opacity-50 rounded-lg overflow-hidden border border-red-500 cursor-pointer hover:border-red-400 transition-all duration-200 transform hover:scale-105"
+                    onClick={() => {
+                      setGalleryImagesForModal(article.images || [])
+                      setGalleryCurrentIndex(index)
+                      setIsGalleryOpen(true)
+                    }}
+                  >
                     <img
                       src={imageUrl}
                       alt={`Gallery image ${index + 1}`}
@@ -139,6 +153,14 @@ export default function NewsArticle() {
           </button>
         </div>
       </div>
+
+      {/* Gallery Modal */}
+      <GalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        images={galleryImagesForModal}
+        currentIndex={galleryCurrentIndex}
+      />
     </div>
   );
 }

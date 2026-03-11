@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabase/client'
+import GalleryModal from '../components/GalleryModal'
 
 interface BlogPost {
   id: string
@@ -9,20 +10,36 @@ interface BlogPost {
   content: string
   author: string
   created_at: string
+  images?: string[]
+}
+
+interface GalleryImage {
+  id: string
+  filename: string
+  url: string
+  description: string
+  category: string
 }
 
 export default function Home() {
   const [heroImageUrl, setHeroImageUrl] = useState('/expurgedforside.png')
   const [newsItems, setNewsItems] = useState<BlogPost[]>([])
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([])
   const [loading, setLoading] = useState(true)
+  
+  // Gallery Modal State
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false)
+  const [galleryImagesForModal, setGalleryImagesForModal] = useState<string[]>([])
+  const [galleryCurrentIndex, setGalleryCurrentIndex] = useState(0)
   const supabase = createBrowserSupabaseClient()
 
   useEffect(() => {
     // Load hero image from Supabase backend
     fetchHeroImage()
     
-    // Load latest news
+    // Load latest news and gallery images
     fetchLatestNews()
+    fetchGalleryImages()
   }, [])
 
   const fetchHeroImage = async () => {
@@ -97,6 +114,19 @@ export default function Home() {
     }
   }
 
+  const fetchGalleryImages = async () => {
+    const { data, error } = await supabase
+      .from('images')
+      .select('*')
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching gallery images:', error)
+    } else {
+      setGalleryImages(data || [])
+    }
+  }
+
   const fetchLatestNews = async () => {
     try {
       const { data, error } = await supabase
@@ -108,7 +138,19 @@ export default function Home() {
       if (error) {
         console.error('Error fetching news:', error)
       } else {
-        setNewsItems(data || [])
+        // Parse images arrays if they're stored as JSON strings
+        const parsedNews = (data || []).map(newsItem => {
+          if (typeof newsItem.images === 'string') {
+            try {
+              newsItem.images = JSON.parse(newsItem.images)
+            } catch (e) {
+              console.error('Error parsing images:', e)
+              newsItem.images = []
+            }
+          }
+          return newsItem
+        })
+        setNewsItems(parsedNews)
       }
     } catch (error) {
       console.error('Error fetching news:', error)
@@ -206,6 +248,43 @@ export default function Home() {
                   <div className="text-gray-200 mb-4 line-clamp-3">
                     {news.content.replace(/<[^>]*>/g, '').substring(0, 150)}...
                   </div>
+                  
+                  {/* Associated Images Gallery */}
+                  {news.images && Array.isArray(news.images) && news.images.length > 0 && (
+                    <div className="mb-4">
+                      <h3 className="text-lg font-bold mb-2 text-red-300">Gallery</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {news.images.slice(0, 6).map((imageUrl: string, index: number) => (
+                          <div 
+                            key={index} 
+                            className="bg-black bg-opacity-50 rounded-lg overflow-hidden border border-red-500 cursor-pointer hover:border-red-400 transition-all duration-200 transform hover:scale-105"
+                            onClick={() => {
+                              setGalleryImagesForModal(news.images || [])
+                              setGalleryCurrentIndex(index)
+                              setIsGalleryOpen(true)
+                            }}
+                          >
+                            <img
+                              src={imageUrl}
+                              alt={`Gallery image ${index + 1}`}
+                              className="w-full h-24 object-cover"
+                              onError={(e) => {
+                                e.currentTarget.src = '/placeholder-image.png'
+                              }}
+                            />
+                          </div>
+                        ))}
+                        {news.images.length > 6 && (
+                          <div className="bg-black bg-opacity-50 rounded-lg overflow-hidden border border-red-500 flex items-center justify-center cursor-pointer hover:border-red-400 transition-all duration-200 transform hover:scale-105">
+                            <span className="text-gray-400 text-sm">
+                              +{news.images.length - 6} more
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-400">
                       By {news.author || 'ExPurged Staff'}
@@ -290,6 +369,14 @@ export default function Home() {
           </p>
         </div>
       </footer>
+
+      {/* Gallery Modal */}
+      <GalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        images={galleryImagesForModal}
+        currentIndex={galleryCurrentIndex}
+      />
     </div>
   )
 }

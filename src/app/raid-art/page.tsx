@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createBrowserSupabaseClient } from '@/lib/supabase/client'
+import GalleryModal from '../../components/GalleryModal'
 
 interface Artwork {
   id: string
@@ -18,6 +19,11 @@ interface Artwork {
 export default function RaidArt() {
   const [artworks, setArtworks] = useState<Artwork[]>([])
   const [loading, setLoading] = useState(true)
+  
+  // Gallery Modal State
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false)
+  const [galleryImagesForModal, setGalleryImagesForModal] = useState<string[]>([])
+  const [galleryCurrentIndex, setGalleryCurrentIndex] = useState(0)
   const supabase = createBrowserSupabaseClient()
 
   useEffect(() => {
@@ -103,7 +109,16 @@ export default function RaidArt() {
                   <img
                     src={art.url}
                     alt={art.description}
-                    className="w-full h-auto max-h-96 object-contain rounded-lg border border-red-500"
+                    className="w-full h-auto max-h-96 object-contain rounded-lg border border-red-500 cursor-pointer hover:border-red-400 transition-all duration-200 transform hover:scale-105"
+                    onClick={() => {
+                      // Extract all image URLs from artworks
+                      const allImageUrls = artworks.map(artwork => artwork.url)
+                      setGalleryImagesForModal(allImageUrls)
+                      // Find the index of current artwork
+                      const currentIndex = artworks.findIndex(a => a.id === art.id)
+                      setGalleryCurrentIndex(currentIndex)
+                      setIsGalleryOpen(true)
+                    }}
                   />
                 </div>
                 <div className="text-center mt-6 max-w-2xl">
@@ -124,6 +139,14 @@ export default function RaidArt() {
           </button>
         </div>
       </div>
+
+      {/* Gallery Modal */}
+      <GalleryModal
+        isOpen={isGalleryOpen}
+        onClose={() => setIsGalleryOpen(false)}
+        images={galleryImagesForModal}
+        currentIndex={galleryCurrentIndex}
+      />
     </div>
   );
 }
