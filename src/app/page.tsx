@@ -27,48 +27,72 @@ export default function Home() {
 
   const fetchHeroImage = async () => {
     try {
-      // Try to get the hero image setting from Supabase
+      // Try to get all hero images from Supabase using is_hero column
       const { data, error } = await supabase
         .from('images')
         .select('url')
-        .eq('category', 'hero')
+        .eq('is_hero', true)
         .order('created_at', { ascending: false })
-        .limit(1)
 
       if (error) {
-        console.error('Error fetching hero image from database:', error)
+        console.error('Error fetching hero images from database:', error)
         // Fall back to localStorage
-        const savedHero = localStorage.getItem('heroImage')
-        if (savedHero && savedHero !== '/expurgedforside.png') {
-          console.log('Using hero image from localStorage:', savedHero)
-          setHeroImageUrl(savedHero)
-        } else {
-          console.log('No hero image found, using default')
-          setHeroImageUrl('/expurgedforside.png')
+        const savedHeroes = localStorage.getItem('heroImages')
+        if (savedHeroes) {
+          try {
+            const parsed = JSON.parse(savedHeroes)
+            if (parsed && parsed.length > 0) {
+              const randomIndex = Math.floor(Math.random() * parsed.length)
+              const randomHero = parsed[randomIndex]
+              console.log('Using random hero image from localStorage:', randomHero)
+              setHeroImageUrl(randomHero)
+              return
+            }
+          } catch (parseError) {
+            console.error('Error parsing localStorage hero images:', parseError)
+          }
         }
+        // Final fallback to default
+        console.log('No hero images found, using default')
+        setHeroImageUrl('/expurgedforside.png')
       } else if (data && data.length > 0) {
-        console.log('Hero image from database:', data[0].url)
+        console.log(`Found ${data.length} hero image(s) in database`)
+        // Randomly select one from the available hero images
+        const randomIndex = Math.floor(Math.random() * data.length)
+        const selectedHero = data[randomIndex].url
+        
         // Validate the URL before setting it
-        if (data[0].url && data[0].url.trim() !== '') {
-          setHeroImageUrl(data[0].url)
+        if (selectedHero && selectedHero.trim() !== '') {
+          console.log('Using random hero image from database:', selectedHero)
+          setHeroImageUrl(selectedHero)
         } else {
           console.log('Invalid hero image URL from database, using default')
           setHeroImageUrl('/expurgedforside.png')
         }
       } else {
-        console.log('No hero image found in database, checking localStorage')
+        console.log('No hero images found in database, checking localStorage')
         // Fall back to localStorage
-        const savedHero = localStorage.getItem('heroImage')
-        if (savedHero && savedHero !== '/expurgedforside.png') {
-          console.log('Using hero image from localStorage:', savedHero)
-          setHeroImageUrl(savedHero)
-        } else {
-          console.log('No hero image found, using default')
-          setHeroImageUrl('/expurgedforside.png')
+        const savedHeroes = localStorage.getItem('heroImages')
+        if (savedHeroes) {
+          try {
+            const parsed = JSON.parse(savedHeroes)
+            if (parsed && parsed.length > 0) {
+              const randomIndex = Math.floor(Math.random() * parsed.length)
+              const randomHero = parsed[randomIndex]
+              console.log('Using random hero image from localStorage:', randomHero)
+              setHeroImageUrl(randomHero)
+              return
+            }
+          } catch (parseError) {
+            console.error('Error parsing localStorage hero images:', parseError)
+          }
         }
+        // Final fallback to default
+        console.log('No hero images found, using default')
+        setHeroImageUrl('/expurgedforside.png')
       }
     } catch (error) {
-      console.error('Error fetching hero image:', error)
+      console.error('Error fetching hero images:', error)
       setHeroImageUrl('/expurgedforside.png')
     }
   }

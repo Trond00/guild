@@ -29,8 +29,8 @@ export default function Recruitment() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-900 via-orange-900 to-black text-white pt-16">
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <h1 className="text-4xl md:text-6xl font-bold text-center text-white-400 mb-12">
-          Join ExPurged1
+        <h1 className="text-4xl md:text-6xl font-bold text-center text-red-400 mb-12">
+          Join ExPurged
         </h1>
 
         <div className="text-center mb-12">
