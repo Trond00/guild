@@ -21,11 +21,21 @@ interface GalleryImage {
   category: string
 }
 
+interface AboutUsContent {
+  id: string
+  section_key: string
+  title: string
+  content: string
+  created_at: string
+  updated_at: string
+}
+
 export default function Home() {
   const [heroImageUrl, setHeroImageUrl] = useState('/expurgedforside.png')
   const [newsItems, setNewsItems] = useState<BlogPost[]>([])
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([])
   const [loading, setLoading] = useState(true)
+  const [aboutUsContent, setAboutUsContent] = useState<AboutUsContent | null>(null)
   
   // Gallery Modal State
   const [isGalleryOpen, setIsGalleryOpen] = useState(false)
@@ -40,6 +50,9 @@ export default function Home() {
     // Load latest news and gallery images
     fetchLatestNews()
     fetchGalleryImages()
+    
+    // Load About Us content
+    fetchAboutUsContent()
   }, [])
 
   const fetchHeroImage = async () => {
@@ -159,6 +172,25 @@ export default function Home() {
     }
   }
 
+  const fetchAboutUsContent = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('content_sections')
+        .select('*')
+        .eq('section_key', 'about_us')
+        .single()
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
+        console.error('Error fetching About Us content:', error)
+      } else if (data) {
+        setAboutUsContent(data)
+      }
+      // If no data found, we'll use the default content in the render
+    } catch (error) {
+      console.error('Error fetching About Us content:', error)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-red-900 via-orange-900 to-black text-white">
       {/* Hero Section */}
@@ -203,13 +235,11 @@ export default function Home() {
       <section className="py-16 px-4 sm:px-6 lg:px-8 bg-black bg-opacity-80">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-8 text-white-400">
-            About Us
+            {aboutUsContent?.title || 'About Us'}
           </h2>
           <div className="bg-gradient-to-r from-red-900 to-orange-900 p-8 rounded-xl shadow-2xl">
             <p className="text-lg sm:text-xl md:text-2xl leading-relaxed text-gray-100">
-              ExPurged is a legendary Horde guild on Ragnaros server, dedicated to conquering 
-              the greatest challenges Azeroth has to offer. From raiding the toughest dungeons 
-              to PvP glory, we stand united for the Horde's supremacy.
+              {aboutUsContent?.content || 'ExPurged is a legendary Horde guild on Ragnaros server, dedicated to conquering the greatest challenges Azeroth has to offer. From raiding the toughest dungeons to PvP glory, we stand united for the Horde\'s supremacy.'}
             </p>
           </div>
         </div>

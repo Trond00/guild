@@ -19,12 +19,26 @@ interface FrontpageSettings {
   heroImage: string
 }
 
+interface AboutUsContent {
+  id: string
+  section_key: string
+  title: string
+  content: string
+  created_at: string
+  updated_at: string
+}
+
 export default function AdminFrontpage() {
   const [images, setImages] = useState<Image[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [selectedImages, setSelectedImages] = useState<Set<string>>(new Set())
   const [successMessage, setSuccessMessage] = useState('')
+  const [aboutUsContent, setAboutUsContent] = useState<AboutUsContent | null>(null)
+  const [aboutUsTitle, setAboutUsTitle] = useState('')
+  const [aboutUsText, setAboutUsText] = useState('')
+  const [aboutUsLoading, setAboutUsLoading] = useState(false)
+  const [aboutUsSaving, setAboutUsSaving] = useState(false)
   const supabase = createBrowserSupabaseClient()
 
   useEffect(() => {
@@ -204,6 +218,94 @@ setSuccessMessage(`Hero rotation saved successfully! ${selectedImages.size} imag
     }, 3000)
   }
 
+  // About Us Content Management Functions
+  const fetchAboutUsContent = async () => {
+    setAboutUsLoading(true)
+    try {
+      const { data, error } = await supabase
+        .from('content_sections')
+        .select('*')
+        .eq('section_key', 'about_us')
+        .single()
+
+      if (error && error.code !== 'PGRST116') { // PGRST116 means no rows found
+        console.error('Error fetching About Us content:', error)
+        setSuccessMessage('Error loading About Us content.')
+      } else if (data) {
+        setAboutUsContent(data)
+        setAboutUsTitle(data.title || '')
+        setAboutUsText(data.content || '')
+      } else {
+        // No content found, use default
+        setAboutUsTitle('About Us')
+        setAboutUsText('ExPurged is a legendary Horde guild on Ragnaros server, dedicated to conquering the greatest challenges Azeroth has to offer. From raiding the toughest dungeons to PvP glory, we stand united for the Horde\'s supremacy.')
+      }
+    } catch (error) {
+      console.error('Error fetching About Us content:', error)
+      setSuccessMessage('Error loading About Us content.')
+    } finally {
+      setAboutUsLoading(false)
+    }
+  }
+
+  const handleSaveAboutUs = async () => {
+    // Content validation
+    const trimmedTitle = aboutUsTitle.trim()
+    const trimmedContent = aboutUsText.trim()
+    
+    if (!trimmedContent) {
+      setSuccessMessage('Please enter some content for the About Us section.')
+      return
+    }
+    
+    if (trimmedContent.length > 2000) {
+      setSuccessMessage('Content is too long. Please keep it under 2000 characters.')
+      return
+    }
+    
+    if (trimmedTitle && trimmedTitle.length > 100) {
+      setSuccessMessage('Title is too long. Please keep it under 100 characters.')
+      return
+    }
+
+    setAboutUsSaving(true)
+    try {
+      const contentData = {
+        section_key: 'about_us',
+        title: trimmedTitle || 'About Us',
+        content: trimmedContent
+      }
+
+      const { error } = await supabase
+        .from('content_sections')
+        .upsert(contentData, { onConflict: 'section_key' })
+
+      if (error) {
+        console.error('Error saving About Us content:', error)
+        setSuccessMessage('Error saving About Us content. Please try again.')
+      } else {
+        setSuccessMessage('About Us content saved successfully!')
+        // Refresh the content
+        fetchAboutUsContent()
+      }
+    } catch (error) {
+      console.error('Error saving About Us content:', error)
+      setSuccessMessage('Error saving About Us content. Please try again.')
+    } finally {
+      setAboutUsSaving(false)
+    }
+
+    // Clear success message after 3 seconds
+    setTimeout(() => {
+      setSuccessMessage('')
+    }, 3000)
+  }
+
+  const handleResetAboutUs = () => {
+    setAboutUsTitle('About Us')
+    setAboutUsText('ExPurged is a legendary Horde guild on Ragnaros server, dedicated to conquering the greatest challenges Azeroth has to offer. From raiding the toughest dungeons to PvP glory, we stand united for the Horde\'s supremacy.')
+  }
+
   if (loading) {
     return <div className="text-center py-8">Loading...</div>
   }
@@ -298,6 +400,69 @@ setSuccessMessage(`Hero rotation saved successfully! ${selectedImages.size} imag
             ))}
           </div>
         )}
+      </div>
+
+      {/* About Us Content Management */}
+      <div className="mt-12 border-t border-gray-200 pt-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">About Us Content</h2>
+        
+        <div className="bg-white rounded-lg shadow-lg p-6">
+          <div className="mb-4">
+            <label htmlFor="aboutUsTitle" className="block text-sm font-medium text-gray-700 mb-2">
+              Section Title
+            </label>
+            <input
+              type="text"
+              id="aboutUsTitle"
+              value={aboutUsTitle}
+              onChange={(e) => setAboutUsTitle(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              placeholder="Enter section title (e.g., About Us)"
+            />
+          </div>
+
+          <div className="mb-6">
+            <label htmlFor="aboutUsText" className="block text-sm font-medium text-gray-700 mb-2">
+              Content
+            </label>
+            <textarea
+              id="aboutUsText"
+              rows={6}
+              value={aboutUsText}
+              onChange={(e) => setAboutUsText(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent resize-vertical"
+              placeholder="Enter the content for the About Us section..."
+            />
+          </div>
+
+          <div className="flex gap-4">
+            <button
+              onClick={handleSaveAboutUs}
+              disabled={aboutUsSaving}
+              className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg font-medium"
+            >
+              {aboutUsSaving ? 'Saving...' : 'Save About Us Content'}
+            </button>
+            <button
+              onClick={handleResetAboutUs}
+              disabled={aboutUsSaving}
+              className="bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg font-medium"
+            >
+              Reset to Default
+            </button>
+          </div>
+
+          {/* Preview */}
+          <div className="mt-8 p-4 bg-gray-50 rounded-lg">
+            <h3 className="font-semibold text-gray-900 mb-2">Preview:</h3>
+            <div className="bg-gradient-to-r from-red-900 to-orange-900 p-6 rounded-xl shadow-lg">
+              <h4 className="text-xl font-bold text-white mb-4">{aboutUsTitle || 'About Us'}</h4>
+              <p className="text-gray-100 leading-relaxed">
+                {aboutUsText || 'ExPurged is a legendary Horde guild on Ragnaros server, dedicated to conquering the greatest challenges Azeroth has to offer. From raiding the toughest dungeons to PvP glory, we stand united for the Horde\'s supremacy.'}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Info Box */}
